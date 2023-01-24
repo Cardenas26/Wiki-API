@@ -23,6 +23,8 @@ const articleSchema={
 };
 const Article = mongoose.model("Article",articleSchema);
 
+//Targeting all articles//
+
 app.route("/articles")
 
 .get(function(req,res){
@@ -64,6 +66,66 @@ app.route("/articles")
     });
  });
 
+
+
+ // Targeting a specific article//
+ app.route("/articles/:articleTitle")
+ .get(function(req,res){
+    
+Article.findOne({title:req.params.articleTitle}, function(err, foundArticle){
+    if (foundArticle){
+        res.send(foundArticle);
+    } else {
+        res.send("No article matching that title was found.");
+    }
+});
+ })
+ 
+ .put(function(req,res){
+    Article.update(
+        {title:req.params.articleTitle},
+        {title:req.body.title, content:req.body.content},
+        {overwrite:true},
+        function(err){
+            if(!err){res.send("Updated Article");
+        }
+    }
+
+    
+        
+ );
+      
+ })
+
+
+ .patch(function(req,res){
+    Article.update(
+        {title:req.params.articleTitle},
+        {$set:req.body},
+        function(err){
+            if(!err){
+                res.send("succesfully updated article.")
+            }else{
+                res.send(err);
+            }
+        }
+
+    );
+ })
+
+
+ .delete(function(req,res){
+    Article.deleteOne({
+        title:req.params.articleTitle},
+        function(err){
+            if(!err){
+                res.send("Sucessfully deleted article.")
+            }else{
+                res.send(err);
+            }
+        }
+    );
+ });
 
 app.listen(3000,function(){
     console.log("server Started on port 3000");
